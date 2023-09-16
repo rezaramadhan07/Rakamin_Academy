@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>FORM</h1>
+
+    <button onclick="openTab('registrasi')">Registrasi</button>
+    <button onclick="openTab('list')">List Pendaftar</button>
+
+    <div id="registrasi" class="tab">
+        <h3>Form Registrasi</h3>
+        <form id="registrationform">
+            <label for="nama">Nama </label>
+            <input type="text" id="nama" minlength="10" required>
+            <br><br>
+            <label for="umur">Umur </label>
+            <input type="text" id="umur" min="25" required>
+            <br><br>
+            <label for="uangSangu">Uang Sangu</label>
+            <input type="text" id="uangSangu" min="100000" max="1000000" required>
+            <br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <div id="List" class="tab">
+        <h3>List Pendaftar</h3>
+        <table id="pendaftarTable">
+            <thead>
+                <tr>
+                    <th>nama</th>
+                    <th>resume</th>
+                </tr>
+            </thead>
+            <tbody id="pendaftarList">
+
+            </tbody>
+        </table>
+        <p id="resume"></p>
+    </div>
+
+    <script>
+        class Pendaftar {
+            constructor(nama, umur, uangSangu) {
+                this.nama = nama;
+                this.umur = umur;
+                this.uangSangu = uangSangu;
+            }
+        }
+
+        class ListPendaftar {
+            constructor() {
+                this.pendaftarList = [];
+            }
+
+            tambahPendaftar(Pendaftar) {
+                this.pendaftarList.push(Pendaftar);
+            }
+
+            hitungRerata() {
+                let totalUangSangu = 0;
+                let totalUmur = 0;
+
+                for (let i = 0; i < yhis.pendaftarList.length; i++){
+                    totalUangSangu += this.pendaftarList[i].uangSangu;
+                    totalUmur += this.pendaftarList[i].umur;
+                }
+
+                const rerataUangSangu = totalUangSangu / this.pendaftarList.length;
+                const rerataUmur = totalUmur / this.pendaftarList.length;
+
+                return {
+                    rerataUangSangu,
+                    rerataUmur
+                };
+            }
+        }
+
+        function openTab(tabName) {
+            const tabcontent = document.getElementsByClassName("tab");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            document.getElementById(tabName).style.display = "block";
+        }
+
+        document.getElementById("registrationForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const nama = document.getElementById("nama").value;
+            const umur = parseInt(document.getElementById("umur").value);
+            const uangSangu = parseInt(document.getElementById("uangSangu").value);
+
+            if (nama.length < 10 || umur < 25 || uangSangu < 100000 || uangSangu > 1000000) {
+                alert("mohon isi form dengan sesuai");
+                return;
+            }
+
+            const pendaftar = new Pendaftar(nama, umur, uangSangu);
+            const listPendaftar = new ListPendaftar();
+            listPendaftar.tambahPendaftar(pendaftar);
+
+            await updatePendaftarList(listPendaftar);
+            updateResume(listPendaftar);
+        });
+
+        async function updatePendaftarList(listPendaftar) {
+            const pendaftarTable = document.getElementById("pendaftarTable");
+            const pendaftarList = document.getElementById("pendaftarList");
+            const pendaftar = listPendaftar.pendaftarList[listPendaftar.pendaftarList.length - 1];
+            const tableRow = document.createElement("tr");
+            const namaCell = document.createElement("td");
+            namaCell.textContent = pendaftar.nama;
+            tableRow.appendChild(namaCell);
+
+            const resumeCell = document.createElement("td");
+            resumeCell.textContent = "";
+            tableRow.appendChild(resumeCell);
+
+            pendaftarList.appendChild(tableRow)
+        }
+
+        async function updateResume(listPendaftar) {
+            const resume = document.getElementById("resume");
+            const rerata = listPendaftar.hitungRerata();
+
+            resume.textContent = 'Rata-rata pendaftar memiliki uang sangu sebesar ${rerata.rerataUangsangu} dengan rata-rata umur ${rerata.rerataUmur}.'; 
+        }
+    </script>
+</body>
+</html>
